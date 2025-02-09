@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431446344130",
+    "project_id": "weightloss-4312d",
+    "storage_bucket": "weightloss-4312d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431446344130:android:340fb1670168e83151565b",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJzfYMJt2pB9_9vLk7OC2NTgx8IjTzXeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
