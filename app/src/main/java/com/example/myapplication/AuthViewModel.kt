@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
+
 
 class AuthViewModel : ViewModel() {
 
@@ -17,7 +17,7 @@ class AuthViewModel : ViewModel() {
         checkAuthStatus()
     }
 
-    fun checkAuthStatus(){
+    private fun checkAuthStatus(){
         if(auth.currentUser==null){
             _authState.value = AuthState.Unauthenticated
         }else{
@@ -40,6 +40,7 @@ class AuthViewModel : ViewModel() {
                 }
             }
     }
+
     fun signup(email : String, password : String){
         //parbauda parole vai ir
         if(email.isEmpty() || password.isEmpty()){
@@ -62,11 +63,24 @@ class AuthViewModel : ViewModel() {
     }
 
 
-    sealed class AuthState{
-        object Authenticated : AuthState()
-        object Unauthenticated : AuthState()
-        object Loading : AuthState()
-        data class Error(val message : String) : AuthState()
 
+
+
+    sealed class AuthState {
+        abstract val message: String?
+
+        data object Authenticated : AuthState() {
+            override val message: String? = null // или любое другое значение, если нужно
+        }
+
+        data object Unauthenticated : AuthState() {
+            override val message: String? = null // или любое другое значение, если нужно
+        }
+
+        data object Loading : AuthState() {
+            override val message: String? = null // или любое другое значение, если нужно
+        }
+
+        data class Error(override val message: String) : AuthState()
     }
 }
