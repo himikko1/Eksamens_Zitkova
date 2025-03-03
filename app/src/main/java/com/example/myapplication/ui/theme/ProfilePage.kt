@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme
+package com.example.myapplication.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,34 +21,44 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
+    // Get current user from Firebase
+    val user = FirebaseAuth.getInstance().currentUser
+
+    // Extract user's name (email prefix or display name if available)
+    val userName = when {
+        !user?.displayName.isNullOrEmpty() -> user?.displayName
+        !user?.email.isNullOrEmpty() -> user?.email?.substringBefore('@')
+        else -> "User"
+    }
+
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Get current user from Firebase
-        val user = FirebaseAuth.getInstance().currentUser
-
         Text(
             text = "Profile",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Welcome, $userName!",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Medium
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Email: ${user?.email ?: "Not available"}",
-            fontSize = 18.sp
+            fontSize = 16.sp
         )
 
-        Text(
-            text = "User ID: ${user?.uid ?: "Not available"}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
         Button(
             onClick = {
@@ -61,4 +72,3 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
         }
     }
 }
-

@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.pages.HomePage
 import com.example.myapplication.pages.LoginPage
 import com.example.myapplication.pages.SignupPage
+import com.example.myapplication.ui.theme.SettingsPage
 
 // Define navigation items for bottom navigation
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
@@ -51,12 +52,6 @@ sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, 
         icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
         label = "Settings"
     )
-    object Dashboard : BottomNavItem(
-        route = "dashboard",
-        icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-        label = "Settings"
-    )
-
 }
 
 @Composable
@@ -124,31 +119,56 @@ fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel)
                 HomePage(modifier, navController, authViewModel)
             }
 
-            // Temporary placeholder composables for Profile and Settings
-            // until you create the actual page files
+            // Profile page - using temporary implementation until ProfilePage is properly created
             composable(BottomNavItem.Profile.route) {
-                // Temporary implementation until you create ProfilePage
+                // Temporary profile page implementation
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        // Get current user from Firebase
+                        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+
+                        // Extract user's name (email prefix or display name if available)
+                        val userName = when {
+                            !user?.displayName.isNullOrEmpty() -> user?.displayName
+                            !user?.email.isNullOrEmpty() -> user?.email?.substringBefore('@')
+                            else -> "User"
+                        }
+
                         Text("Profile Page", fontSize = 24.sp)
+                        Text(
+                            text = "Welcome, $userName!",
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+
+                        Text(
+                            text = "Email: ${user?.email ?: "Not available"}",
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+
+                        androidx.compose.material3.Button(
+                            onClick = {
+                                authViewModel.signOut()
+                                navController.navigate("login") {
+                                    popUpTo("home") { inclusive = true }
+                                }
+                            },
+                            modifier = Modifier.padding(top = 32.dp)
+                        ) {
+                            Text("Iziet")
+                        }
                     }
                 }
             }
+
+            // Используем нашу новую страницу настроек вместо временной
             composable(BottomNavItem.Settings.route) {
-                // Temporary implementation until you create SettingsPage
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text("Settings Page", fontSize = 24.sp)
-                    }
-                }
+                SettingsPage(modifier, navController, authViewModel)
             }
         }
     }
