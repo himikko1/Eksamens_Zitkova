@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -13,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +29,9 @@ import com.example.myapplication.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.example.myapplication.R // Ensure this import is correct
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @Composable
 fun HomePage(
@@ -51,7 +58,7 @@ fun HomePage(
         ElevatedButton(onClick = {
             authViewModel.signOut()
         }) {
-            Text(text = "Sign out")
+            Text(text = "Izlogoties")
         }
 
         // funkcijas uzsauksana , lai redzetu todo listu
@@ -59,17 +66,38 @@ fun HomePage(
     }
 }
 
+//funkcija, kura pievieno
 @Composable
 fun TodoList() {
     val todoList = getFakeTodos()
+    var inputText by remember { mutableStateOf("") }
 
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxHeight()
             .padding(8.dp)
     ) {
-        items(todoList) { item ->
-            TodoItem(item) // funkcijas uzsauksana , kai paraditu katru elementu
+        Row {
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = { inputText = it },
+                label = { Text("Pievienot jaunu uzdevumu") },
+                modifier = Modifier.weight(1f)
+            )
+            Button(onClick = {
+            }) {
+                Text(text = "Pievienot")
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(8.dp)
+        ) {
+            itemsIndexed(todoList) { index: Int, item: Todo ->
+                TodoItem(item = item) // izvada visus item
+            }
         }
     }
 }
