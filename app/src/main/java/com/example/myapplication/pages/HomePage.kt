@@ -4,7 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,12 +15,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.example.myapplication.R // Ensure this import is correct
 
 @Composable
 fun HomePage(
@@ -69,18 +76,37 @@ fun TodoList() {
 
 @Composable
 fun TodoItem(item: Todo) {
-    //rowa taisu vizualu
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.primary)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            // formatesana datuma un laiku
-            val dateFormat = SimpleDateFormat("HH:mm aa, dd/MM", Locale.getDefault())
-            Text(text = dateFormat.format(item.createdAt))
-            Text(text = item.title)
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                SimpleDateFormat("HH:mm:aa, dd/MM", Locale.ENGLISH).format(item.createdAt),
+                fontSize = 12.sp,
+                color = Color.LightGray
+            )
+            Text(
+                text = item.title,
+                fontSize = 20.sp,
+                color = Color.White
+            )
+        }
+        IconButton(onClick = { /* Handle delete action */ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_delete_outline_24), // ikona
+                contentDescription = "Delete",
+                tint = Color.White
+            )
         }
     }
 }
