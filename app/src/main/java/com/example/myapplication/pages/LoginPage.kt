@@ -125,4 +125,13 @@ fun LoginPage(
         }
     }
 
+    // Внутри функции LoginPage
+    Spacer(modifier = Modifier.height(8.dp))
+
+    TextButton(onClick = {
+        navController.navigate("reset_password")
+    }) {
+        Text(text = "Forgot Password?")
+    }
+
 }

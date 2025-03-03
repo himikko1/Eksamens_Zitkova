@@ -41,6 +41,18 @@ class AuthViewModel : ViewModel() {
             }
     }
 
+//funkcija, ja aizmirsa parole
+    fun resetPassword(email: String, callback: (Boolean, String) -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    callback(true, "Reset link sent to your email")
+                } else {
+                    callback(false, task.exception?.message ?: "Something went wrong")
+                }
+            }
+    }
+
     fun signup(email : String, password : String){
         //parbauda parole vai ir
         if(email.isEmpty() || password.isEmpty()){

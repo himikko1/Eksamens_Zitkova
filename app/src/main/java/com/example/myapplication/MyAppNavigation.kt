@@ -128,10 +128,10 @@ fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel)
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        // Get current user from Firebase
+                        // dabuj user from firebase
                         val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
 
-                        // Extract user's name (email prefix or display name if available)
+                        // izraksta lietotāja vārdu
                         val userName = when {
                             !user?.displayName.isNullOrEmpty() -> user?.displayName
                             !user?.email.isNullOrEmpty() -> user?.email?.substringBefore('@')
@@ -166,7 +166,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel)
                 }
             }
 
-            // Используем нашу новую страницу настроек вместо временной
+            // izmantoju jaunu iestatijumu lapu , nevis pagaidu lapu
             composable(BottomNavItem.Settings.route) {
                 SettingsPage(modifier, navController, authViewModel)
             }
