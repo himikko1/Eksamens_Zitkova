@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -93,6 +94,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.8")
 
 
 }

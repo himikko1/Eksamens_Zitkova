@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -33,7 +32,7 @@ import com.example.myapplication.pages.LoginPage
 import com.example.myapplication.pages.SignupPage
 import com.example.myapplication.ui.theme.SettingsPage
 
-// Define navigation items for bottom navigation
+// Definē navigation items uz bottom navigation
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
     object Home : BottomNavItem(
         route = "home",
@@ -55,7 +54,11 @@ sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, 
 }
 
 @Composable
-fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
+fun MyAppNavigation(
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
+    todoViewModel: TodoViewModel
+) {
     val navController = rememberNavController()
 
     // Observe authentication state
@@ -71,7 +74,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel)
 
     Scaffold(
         bottomBar = {
-            // Show bottom navigation only when authenticated
+            // parāda bottom nav tikai tad , kad auth
             if (isAuthenticated) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -84,12 +87,12 @@ fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel)
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
                                 navController.navigate(item.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
+                                    // Pop up to the sākuma distanciju  grafā
+                                    // izvarās no lielā stack distancijām
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
-                                    // Avoid multiple copies of the same destination
+                                    // Izvairās no vienā un tā pašā vairākām kopijām
                                     launchSingleTop = true
                                     // Restore state when reselecting a previously selected item
                                     restoreState = true
@@ -114,12 +117,12 @@ fun MyAppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel)
                 SignupPage(modifier, navController, authViewModel)
             }
 
-            // Main screens (with bottom navigation)
+            //galvēnie ekrāni (ar bottom navigation)
             composable(BottomNavItem.Home.route) {
-                HomePage(modifier, navController, authViewModel)
+                HomePage(modifier, navController, authViewModel, todoViewModel)
             }
 
-            // Profile page - using temporary implementation until ProfilePage is properly created
+            // tiek izmantota *pagaidu* implementacija , līdz , kad ProfilePage tiek pareizi izvedoita
             composable(BottomNavItem.Profile.route) {
                 // Temporary profile page implementation
                 Surface(modifier = Modifier.fillMaxSize()) {
