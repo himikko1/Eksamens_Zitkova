@@ -57,7 +57,8 @@ sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, 
 fun MyAppNavigation(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    todoViewModel: TodoViewModel
+    todoViewModel: TodoViewModel,
+    bmiViewModel: BmiViewModel
 ) {
     val navController = rememberNavController()
 
@@ -119,7 +120,7 @@ fun MyAppNavigation(
 
             //galvēnie ekrāni (ar bottom navigation)
             composable(BottomNavItem.Home.route) {
-                HomePage(modifier, navController, authViewModel, todoViewModel)
+                HomePage(modifier, navController, authViewModel, todoViewModel,  bmiViewModel )
             }
 
             // tiek izmantota *pagaidu* implementacija , līdz , kad ProfilePage tiek pareizi izvedoita

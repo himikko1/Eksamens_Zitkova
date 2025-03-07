@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.AuthViewModel
+import com.example.myapplication.BmiViewModel
 import com.example.myapplication.Todo
 import com.example.myapplication.TodoViewModel
 import java.text.SimpleDateFormat
@@ -35,7 +38,8 @@ fun HomePage(
     modifier: Modifier = Modifier,
     navController: NavController,
     authViewModel: AuthViewModel,
-    todoViewModel: TodoViewModel
+    todoViewModel: TodoViewModel,
+    bmiViewModel: BmiViewModel
 ) {
     val authState = authViewModel.authState.observeAsState()
     val error = todoViewModel.error.observeAsState()
@@ -82,19 +86,143 @@ fun HomePage(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
-
-        TodoList(
-            viewModel = todoViewModel,
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 8.dp)
-        )
+                .verticalScroll(rememberScrollState())
+        ) {
+
+            BmiCalculator(
+                bmiViewModel = bmiViewModel,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+
+
+            TodoListOriginal(
+                viewModel = todoViewModel,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
     }
 }
 
 @Composable
-fun TodoList(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
+fun BmiCalculator(
+    bmiViewModel: BmiViewModel,
+    modifier: Modifier = Modifier
+) {
+    val height by bmiViewModel.height.observeAsState(170f)
+    val weight by bmiViewModel.weight.observeAsState(70f)
+    val bmiResult by bmiViewModel.bmiResult.observeAsState(0f)
+    val bmiCategory by bmiViewModel.bmiCategory.observeAsState("")
+
+    Card(
+        modifier = modifier
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Kalkulators KMI",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // izvada augumu
+            Text(
+                text = "Augums: ${height.toInt()} см",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            // slider prieks augumu
+            Slider(
+                value = height,
+                onValueChange = { bmiViewModel.updateHeight(it) },
+                valueRange = 100f..220f,
+                steps = 120,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // izvada svaru
+            Text(
+                text = "Svars: ${weight.toInt()} kg",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            // slaider prieks svaru
+            Slider(
+                value = weight,
+                onValueChange = { bmiViewModel.updateWeight(it) },
+                valueRange = 30f..150f,
+                steps = 120,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // rezultats
+            BmiResultDisplay(bmiResult, bmiCategory)
+        }
+    }
+}
+
+@Composable
+fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
+    val backgroundColor = when {
+        bmiResult < 18.5 -> Color(0xFFF5F5DC)
+        bmiResult < 25 -> Color(0xFFDEF1D8)
+        bmiResult < 30 -> Color(0xFFFFE5B4)
+        else -> Color(0xFFFFCCCB)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Jūsu ĶMI",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = String.format("%.1f", bmiResult),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = bmiCategory,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
+    }
+}
+
+
+@Composable
+fun TodoListOriginal(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
     val todoList by viewModel.todoList.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
     var inputText by remember { mutableStateOf("") }
@@ -193,8 +321,11 @@ fun TodoList(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
             }
         } else if (!isLoading) {
             LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                userScrollEnabled = true
             ) {
                 itemsIndexed(todoList) { _, item ->
                     TodoItem(

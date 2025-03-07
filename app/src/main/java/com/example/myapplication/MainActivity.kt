@@ -14,6 +14,7 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
     private val todoViewModel: TodoViewModel by viewModels()
+    private val bmiViewModel: BmiViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +25,8 @@ class MainActivity : ComponentActivity() {
                     MyAppNavigation(
                         modifier = Modifier.padding(innerPadding),
                         authViewModel = authViewModel,
-                        todoViewModel = todoViewModel
+                        todoViewModel = todoViewModel,
+                        bmiViewModel = bmiViewModel
                     )
                 }
             }
