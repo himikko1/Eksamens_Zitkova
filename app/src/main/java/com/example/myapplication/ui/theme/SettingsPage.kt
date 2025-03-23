@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Calculate // Import the correct icon
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,13 +39,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.myapplication.AuthViewModel
+import com.example.myapplication.models.AuthViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
-//import com.maxkeppeler.sheets.core.models.base.rememberUseCaseState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +54,7 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
     var appSettingsExpanded by remember { mutableStateOf(false) }
     var notificationSettingsExpanded by remember { mutableStateOf(false) }
     var privacySettingsExpanded by remember { mutableStateOf(false) }
+    var calorieCalculatorExpanded by remember { mutableStateOf(false) }
 
     // Kalendāra stāvokļa izveide
     val calendarState = rememberUseCaseState()
@@ -132,6 +134,39 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Update the SettingsSection for the calorie calculator
+        SettingsSection(
+            title = "Kaloriju kalkulators",
+            icon = Icons.Default.Calculate, // Use the correct icon here
+            expanded = calorieCalculatorExpanded,
+            onToggle = { calorieCalculatorExpanded = !calorieCalculatorExpanded }
+        ) {
+            Button(
+                onClick = { navController.navigate("calorie_calculator") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Icon(
+                    Icons.Default.Calculate, // Use the correct icon here
+                    contentDescription = "Kaloriju kalkulators",
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text("Aprēķināt kalorijas")
+            }
+
+            Button(
+                onClick = { navController.navigate("calorie_history") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("Kaloriju vēsture")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // kind of notif
         SettingsSection(
             title = "Paziņojumu iestatījumi",
@@ -205,12 +240,12 @@ fun SettingsSection(
             modifier = Modifier.padding(16.dp)
         ) {
             // Sadaļas galvene ar nolaižamo pogu
-            androidx.compose.foundation.layout.Row(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                androidx.compose.foundation.layout.Row(
+                Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(

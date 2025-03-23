@@ -17,7 +17,7 @@
 //import androidx.compose.ui.unit.dp
 //import androidx.compose.ui.unit.sp
 //import androidx.navigation.NavController
-//import com.example.myapplication.AuthViewModel
+//import com.example.myapplication.models.AuthViewModel
 //
 //@Composable
 //fun ResetPasswordPage(

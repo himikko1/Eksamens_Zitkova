@@ -27,6 +27,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.models.AuthViewModel
+import com.example.myapplication.models.BmiViewModel
+//import com.example.myapplication.models.CalorieCalculatorViewModel
+//import com.example.myapplication.pages.CalorieCalculatorPage
+//import com.example.myapplication.pages.CalorieHistoryPage
 import com.example.myapplication.pages.HomePage
 import com.example.myapplication.pages.LoginPage
 import com.example.myapplication.pages.SignupPage
@@ -58,7 +63,8 @@ fun MyAppNavigation(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
-    bmiViewModel: BmiViewModel
+    bmiViewModel: BmiViewModel,
+   // calorieCalculatorViewModel: CalorieCalculatorViewModel
 ) {
     val navController = rememberNavController()
 
@@ -174,6 +180,14 @@ fun MyAppNavigation(
             composable(BottomNavItem.Settings.route) {
                 SettingsPage(modifier, navController, authViewModel)
             }
+
+//            composable("calorie_calculator") {
+//                CalorieCalculatorPage(modifier, navController, calorieCalculatorViewModel)
+//            }
+//
+//            composable("calorie_history") {
+//                CalorieHistoryPage(modifier, navController, calorieCalculatorViewModel)
+//            }
         }
     }
 }

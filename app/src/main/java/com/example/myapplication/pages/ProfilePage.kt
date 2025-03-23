@@ -1,5 +1,6 @@
 package com.example.myapplication.pages
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,15 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.myapplication.AuthViewModel
+import com.example.myapplication.models.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
-    // Get current user from Firebase
+
     val user = FirebaseAuth.getInstance().currentUser
 
-    // Extract user's name (email prefix or display name if available)
+
     val userName = when {
         !user?.displayName.isNullOrEmpty() -> user?.displayName
         !user?.email.isNullOrEmpty() -> user?.email?.substringBefore('@')
@@ -44,6 +45,7 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
         )
 
         Spacer(modifier = Modifier.height(32.dp))
+
 
         Text(
             text = "Welcome, $userName!",
@@ -69,6 +71,13 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
             }
         ) {
             Text("Sign Out")
+        }
+
+        Button(
+            onClick = { navController.navigate("calorie_calculator") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Калькулятор калорий")
         }
     }
 }
