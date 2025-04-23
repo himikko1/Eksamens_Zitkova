@@ -24,6 +24,7 @@ import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.Todo
 import com.example.myapplication.TodoViewModel
+import com.example.myapplication.viewmodel.WaterViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -33,7 +34,8 @@ fun HomePage(
     navController: NavController,
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
-    bmiViewModel: BmiViewModel
+    bmiViewModel: BmiViewModel,
+    waterViewModel: WaterViewModel
 ) {
     val authState = authViewModel.authState.observeAsState()
     val error = todoViewModel.error.observeAsState()
@@ -94,6 +96,15 @@ fun HomePage(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
+            Button(
+                onClick = { navController.navigate("water_tracker") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("Счетчик воды 💧")
+            }
+
 
 
             TodoListOriginal(

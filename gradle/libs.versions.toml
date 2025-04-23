@@ -4,6 +4,7 @@ agp = "8.7.3"
 coilCompose = "2.6.0"
 composeBomVersion = "2025.01.01"
 firebaseBom = "33.12.0"
+firebaseStorageKtx = "21.0.1"
 foundation = "1.7.8"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -36,6 +37,7 @@ androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = 
 androidx-runtime-livedata-v178 = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedataVersion" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-storage-ktx = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 google-firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

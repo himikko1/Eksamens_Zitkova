@@ -82,6 +82,11 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
         ) {
             Text("Калькулятор калорий")
         }
+        Spacer(modifier = Modifier.height(16.dp)) // Добавь отступ
+
+        Button(onClick = { navController.navigate("sleep_tracker") }) {
+            Text("Отслеживание сна")
+        }
     }
 }
 

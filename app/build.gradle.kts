@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.coil.compose) // For image loading (optional, but recommended)
 
     // Firebase - исправлено для избежания конфликтов
+    implementation(libs.firebase.storage.ktx) // Use the latest version
     implementation(platform(libs.firebase.bom))
     implementation(libs.google.firebase.auth.ktx)
     implementation(libs.google.firebase.firestore.ktx)

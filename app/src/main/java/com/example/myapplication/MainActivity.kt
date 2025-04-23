@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.app.FragmentManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,14 +14,17 @@ import androidx.compose.ui.Modifier
 import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.models.CalorieCalculatorViewModel
+//import com.example.myapplication.models.SleepViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.viewmodel.WaterViewModel
 import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
     private val todoViewModel: TodoViewModel by viewModels()
     private val bmiViewModel: BmiViewModel by viewModels()
-   // private val calorieCalculatorViewModel: CalorieCalculatorViewModel by viewModels()
+   // private val sleepViewModel: SleepViewModel by viewModels()
+    private val calorieCalculatorViewModel: CalorieCalculatorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +48,10 @@ class MainActivity : ComponentActivity() {
                         authViewModel = authViewModel,
                         todoViewModel = todoViewModel,
                         bmiViewModel = bmiViewModel,
-                        //calorieCalculatorViewModel = calorieCalculatorViewModel
+                        calorieCalculatorViewModel = calorieCalculatorViewModel,
+                        waterViewModel = WaterViewModel(),
+//                        sleepViewModel = sleepViewModel,
+//                        fragmentManager = FragmentManager
                     )
                 }
             }

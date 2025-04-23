@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -31,12 +32,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.models.CalorieCalculatorViewModel
+//import com.example.myapplication.models.SleepViewModel
 import com.example.myapplication.pages.CalorieCalculatorPage
 import com.example.myapplication.pages.CalorieHistoryPage
 import com.example.myapplication.pages.HomePage
 import com.example.myapplication.pages.LoginPage
 import com.example.myapplication.pages.SignupPage
+//import com.example.myapplication.pages.SleepTrackerPage
 import com.example.myapplication.ui.theme.SettingsPage
+import com.example.myapplication.pages.WaterTrackerPage
+import com.example.myapplication.viewmodel.WaterViewModel
+
 
 // Definē navigation items uz bottom navigation
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
@@ -65,7 +71,10 @@ fun MyAppNavigation(
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
     bmiViewModel: BmiViewModel,
-   // calorieCalculatorViewModel: CalorieCalculatorViewModel
+    waterViewModel: WaterViewModel,
+    calorieCalculatorViewModel: CalorieCalculatorViewModel,
+//    sleepViewModel: SleepViewModel,
+//    fragmentManager: FragmentManager,
 ) {
     val navController = rememberNavController()
 
@@ -127,7 +136,7 @@ fun MyAppNavigation(
 
             //galvēnie ekrāni (ar bottom navigation)
             composable(BottomNavItem.Home.route) {
-                HomePage(modifier, navController, authViewModel, todoViewModel,  bmiViewModel )
+                HomePage(modifier, navController, authViewModel, todoViewModel,  bmiViewModel, waterViewModel )
             }
 
             // tiek izmantota *pagaidu* implementacija , līdz , kad ProfilePage tiek pareizi izvedoita
@@ -184,6 +193,7 @@ fun MyAppNavigation(
                 SettingsPage(modifier, navController, authViewModel)
             }
 
+
             composable("calorie_calculator") {
                CalorieCalculatorPage(modifier, navController,
                    calorieCalculatorViewModel = CalorieCalculatorViewModel()
@@ -195,6 +205,18 @@ fun MyAppNavigation(
                     calorieCalculatorViewModel = CalorieCalculatorViewModel()
                 )
             }
+
+            composable("water_tracker") {
+                WaterTrackerPage(modifier, navController)
+            }
+
+//            composable("sleep_tracker") {
+//                SleepTrackerPage(
+//                    navController = navController,
+//                    fragmentManager = fragmentManager, // Передаем FragmentManager
+//                    sleepViewModel = sleepViewModel   // Передаем SleepViewModel
+//                )
+//            }
         }
     }
 }

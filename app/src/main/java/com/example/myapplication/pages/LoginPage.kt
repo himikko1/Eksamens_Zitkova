@@ -64,14 +64,7 @@ fun LoginPage(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color(rgb(229, 54, 99)), // Sakuma krasa
-                        Color(rgb(89, 84, 85))  // beiga krasa
-                    )
-                )
-            ),
+            .background(Color.White), // Set background color to white
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
