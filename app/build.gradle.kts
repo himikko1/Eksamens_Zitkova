@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.browser)
     //Images
     implementation(libs.ui)
     implementation(libs.androidx.material)
@@ -78,6 +79,7 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
+    //implementation(libs.androidbrowserhelper)
     val nav_version = "2.8.8"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.navigation:navigation-fragment:$nav_version")

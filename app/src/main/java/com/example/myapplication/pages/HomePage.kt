@@ -24,7 +24,7 @@ import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.Todo
 import com.example.myapplication.TodoViewModel
-import com.example.myapplication.viewmodel.WaterViewModel
+//import com.example.myapplication.viewmodel.WaterViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -34,8 +34,8 @@ fun HomePage(
     navController: NavController,
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
-    bmiViewModel: BmiViewModel,
-    waterViewModel: WaterViewModel
+    bmiViewModel: BmiViewModel
+    //waterViewModel: WaterViewModel
 ) {
     val authState = authViewModel.authState.observeAsState()
     val error = todoViewModel.error.observeAsState()

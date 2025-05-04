@@ -41,7 +41,7 @@ import com.example.myapplication.pages.SignupPage
 //import com.example.myapplication.pages.SleepTrackerPage
 import com.example.myapplication.ui.theme.SettingsPage
 import com.example.myapplication.pages.WaterTrackerPage
-import com.example.myapplication.viewmodel.WaterViewModel
+//import com.example.myapplication.viewmodel.WaterViewModel
 
 
 // Definē navigation items uz bottom navigation
@@ -71,7 +71,7 @@ fun MyAppNavigation(
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
     bmiViewModel: BmiViewModel,
-    waterViewModel: WaterViewModel,
+//    waterViewModel: WaterViewModel,
     calorieCalculatorViewModel: CalorieCalculatorViewModel,
 //    sleepViewModel: SleepViewModel,
 //    fragmentManager: FragmentManager,
@@ -136,7 +136,7 @@ fun MyAppNavigation(
 
             //galvēnie ekrāni (ar bottom navigation)
             composable(BottomNavItem.Home.route) {
-                HomePage(modifier, navController, authViewModel, todoViewModel,  bmiViewModel, waterViewModel )
+                HomePage(modifier, navController, authViewModel, todoViewModel,  bmiViewModel/*, waterViewModel*/ )
             }
 
             // tiek izmantota *pagaidu* implementacija , līdz , kad ProfilePage tiek pareizi izvedoita
