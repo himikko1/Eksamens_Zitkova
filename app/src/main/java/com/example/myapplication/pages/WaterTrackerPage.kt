@@ -10,6 +10,8 @@ import androidx.navigation.NavController
 import com.example.myapplication.models.WaterViewModel
 import com.example.myapplication.R
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +20,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaterTrackerPage(
     modifier: Modifier = Modifier,
@@ -28,33 +31,46 @@ fun WaterTrackerPage(
 ) {
     val waterCount by viewModel.waterCount.collectAsState()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Water Tracker", style = MaterialTheme.typography.headlineMedium)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Replace the single Image with the WaterTrackerVisual composable
-        WaterTrackerVisual(waterCount = waterCount)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text("Стаканов выпито: $waterCount")
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Water Tracker") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate("home") }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back to Home"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { viewModel.decrease() }) {
-                Text("-")
-            }
-            Button(onClick = { viewModel.increase() }) {
-                Text("+")
+            // Replace the single Image with the WaterTrackerVisual composable
+            WaterTrackerVisual(waterCount = waterCount)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text("Стаканов выпито: $waterCount")
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(onClick = { viewModel.decrease() }) {
+                    Text("-")
+                }
+                Button(onClick = { viewModel.increase() }) {
+                    Text("+")
+                }
             }
         }
     }

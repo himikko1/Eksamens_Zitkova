@@ -36,6 +36,7 @@ import com.example.myapplication.models.CalorieCalculatorViewModel
 import com.example.myapplication.pages.CalorieCalculatorPage
 import com.example.myapplication.pages.CalorieHistoryPage
 import com.example.myapplication.pages.HomePage
+import com.example.myapplication.pages.IntermittentFastingPage
 import com.example.myapplication.pages.LoginPage
 import com.example.myapplication.pages.SignupPage
 //import com.example.myapplication.pages.SleepTrackerPage
@@ -209,6 +210,12 @@ fun MyAppNavigation(
             composable("water_tracker") {
                 WaterTrackerPage(modifier, navController)
             }
+
+            composable("intermittent_fasting") {
+                IntermittentFastingPage(modifier, navController)
+            }
+
+
 
 //            composable("sleep_tracker") {
 //                SleepTrackerPage(

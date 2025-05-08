@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +57,7 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
     var notificationSettingsExpanded by remember { mutableStateOf(false) }
     var privacySettingsExpanded by remember { mutableStateOf(false) }
     var calorieCalculatorExpanded by remember { mutableStateOf(false) }
+    var fastingSettingsExpanded by remember { mutableStateOf(false) }
 
     // Kalendāra stāvokļa izveide
     val calendarState = rememberUseCaseState()
@@ -130,6 +132,30 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
                     .padding(vertical = 8.dp)
             ) {
                 Text("Valodas iestatījumi")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // NEW SECTION: Intermittent Fasting
+        SettingsSection(
+            title = "Intervāla Badošanās",
+            icon = Icons.Default.Timer,
+            expanded = fastingSettingsExpanded,
+            onToggle = { fastingSettingsExpanded = !fastingSettingsExpanded }
+        ) {
+            Button(
+                onClick = { navController.navigate("intermittent_fasting") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Icon(
+                    Icons.Default.Timer,
+                    contentDescription = "Intervāla Badošanās",
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text("Sākt intervāla badošanos")
             }
         }
 
@@ -213,14 +239,6 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
             }
 
             NotificationPermissionButton()
-//            Button(
-//                onClick = { /*NotificationPermissionButton()*/ },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(vertical = 8.dp)
-//            ) {
-//                Text("Atļauju iestatījumi")
-//            }
         }
     }
 }
