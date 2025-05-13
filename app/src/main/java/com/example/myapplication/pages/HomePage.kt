@@ -65,7 +65,7 @@ fun HomePage(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Todo List") },
+                title = { Text("Izlogoties") },
                 actions = {
                     IconButton(onClick = { authViewModel.signOut() }) {
                         Icon(
@@ -102,10 +102,16 @@ fun HomePage(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             ) {
-                Text("Счетчик воды 💧")
+                Text("Ūdens skaitītājs 💧")
             }
-
-
+            Button(
+                onClick = { navController.navigate("step_counter") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("Soļu skaitītājs")
+            }
 
             TodoListOriginal(
                 viewModel = todoViewModel,

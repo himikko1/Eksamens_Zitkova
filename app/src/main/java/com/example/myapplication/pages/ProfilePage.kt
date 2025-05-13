@@ -1,5 +1,6 @@
 package com.example.myapplication.pages
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,11 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults // Import ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color // Import Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,7 +35,10 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
     }
 
     Column(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(Color.LightGray),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -71,22 +77,13 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
                 navController.navigate("login") {
                     popUpTo("home") { inclusive = true }
                 }
-            }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
         ) {
             Text("Sign Out")
         }
 
-        Button(
-            onClick = { navController.navigate("calorie_calculator") },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text("Калькулятор калорий")
-        }
-        Spacer(modifier = Modifier.height(16.dp)) // Добавь отступ
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate("sleep_tracker") }) {
-            Text("Отслеживание сна")
-        }
     }
 }
-

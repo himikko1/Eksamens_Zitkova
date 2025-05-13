@@ -1,81 +1,46 @@
-package com.example.myapplication.ui.theme
+package com.example.myapplication.pages
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Calculate
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.NotificationPermissionButton
 import com.example.myapplication.models.AuthViewModel
-import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
-import com.maxkeppeler.sheets.calendar.CalendarDialog
-import com.maxkeppeler.sheets.calendar.models.CalendarConfig
-import com.maxkeppeler.sheets.calendar.models.CalendarSelection
-import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import com.example.myapplication.ui.theme.ThemePreferences
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
-    // Atvērto/aizvērto nodalījumu izsekošanas stāvoklis
+fun SettingsPage(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    isDarkTheme: Boolean,
+    onThemeToggle: (Boolean) -> Unit
+) {
     var appSettingsExpanded by remember { mutableStateOf(false) }
     var notificationSettingsExpanded by remember { mutableStateOf(false) }
     var privacySettingsExpanded by remember { mutableStateOf(false) }
     var calorieCalculatorExpanded by remember { mutableStateOf(false) }
     var fastingSettingsExpanded by remember { mutableStateOf(false) }
+    var healthToolsExpanded by remember { mutableStateOf(false) }
 
-    // Kalendāra stāvokļa izveide
-    val calendarState = rememberUseCaseState()
     val coroutineScope = rememberCoroutineScope()
-
-    // Kalendāra dialogs
-    CalendarDialog(
-        state = calendarState,
-        config = CalendarConfig(
-            monthSelection = true,
-            yearSelection = true,
-            style = CalendarStyle.MONTH
-        ),
-        selection = CalendarSelection.Dates { dates ->
-            // Izvēlēto datumu apstrāde
-            println("Izvēlētie datumi: $dates")
-        }
-    )
+    val context = LocalContext.current
+    val themePreferences = remember { ThemePreferences(context) }
 
     Column(
         modifier = modifier
@@ -91,42 +56,40 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // Lietojumprogrammas iestatījumu sadaļa
         SettingsSection(
-            title = "Lietojumprogrammas iestatījumi",
+            title = "Programmas iestatījumi",
             icon = Icons.Default.Settings,
             expanded = appSettingsExpanded,
             onToggle = { appSettingsExpanded = !appSettingsExpanded }
         ) {
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        calendarState.show()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.Contrast,
+                        contentDescription = "Темная/Светлая тема",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Tumšā tēma")
+                }
+                Switch(
+                    checked = isDarkTheme,
+                    onCheckedChange = { newThemeValue ->
+                        coroutineScope.launch {
+                            themePreferences.setDarkTheme(newThemeValue)
+                            onThemeToggle(newThemeValue)
+                        }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Icon(
-                    Icons.Default.CalendarMonth,
-                    contentDescription = "Kalendārs",
-                    modifier = Modifier.padding(end = 8.dp)
                 )
-                Text("Atvērt kalendāru")
             }
 
             Button(
-                onClick = { /* fun for theme */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text("Tēmas iestatījumi")
-            }
-
-            Button(
-                onClick = { /* func for lang */ },
+                onClick = { /* Языковые настройки */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -137,9 +100,45 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // NEW SECTION: Intermittent Fasting
         SettingsSection(
-            title = "Intervāla Badošanās",
+            title = "Veselības iestatījumi",
+            icon = Icons.Default.CalendarToday,
+            expanded = healthToolsExpanded,
+            onToggle = { healthToolsExpanded = !healthToolsExpanded }
+        ) {
+            Button(
+                onClick = { navController.navigate("menstrual_calendar") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Icon(
+                    Icons.Default.CalendarToday,
+                    contentDescription = "Kalendārs",
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text("Kalendārs")
+            }
+
+            Button(
+                onClick = { navController.navigate("training_videos") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Icon(
+                    Icons.Default.Timer,
+                    contentDescription = "Treniņš",
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text("Тренировки")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        SettingsSection(
+            title = "Intervāla badošana",
             icon = Icons.Default.Timer,
             expanded = fastingSettingsExpanded,
             onToggle = { fastingSettingsExpanded = !fastingSettingsExpanded }
@@ -152,19 +151,18 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
             ) {
                 Icon(
                     Icons.Default.Timer,
-                    contentDescription = "Intervāla Badošanās",
+                    contentDescription = "Intervāla badošāna",
                     modifier = Modifier.padding(end = 8.dp)
                 )
-                Text("Sākt intervāla badošanos")
+                Text("Sākt intervālu badošānu")
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Update the SettingsSection for the calorie calculator
         SettingsSection(
             title = "Kaloriju kalkulators",
-            icon = Icons.Default.Calculate, // Use the correct icon here
+            icon = Icons.Default.Calculate,
             expanded = calorieCalculatorExpanded,
             onToggle = { calorieCalculatorExpanded = !calorieCalculatorExpanded }
         ) {
@@ -175,11 +173,11 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
                     .padding(vertical = 8.dp)
             ) {
                 Icon(
-                    Icons.Default.Calculate, // Use the correct icon here
+                    Icons.Default.Calculate,
                     contentDescription = "Kaloriju kalkulators",
                     modifier = Modifier.padding(end = 8.dp)
                 )
-                Text("Aprēķināt kalorijas")
+                Text("Saskaitīt kalorijas")
             }
 
             Button(
@@ -188,56 +186,18 @@ fun SettingsPage(modifier: Modifier = Modifier, navController: NavController, au
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             ) {
-                Text("Kaloriju vēsture")
+                Text("Kalorijas vēsture")
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // kind of notif
         SettingsSection(
             title = "Paziņojumu iestatījumi",
-            icon = Icons.Default.Notifications,
-            expanded = notificationSettingsExpanded,
-            onToggle = { notificationSettingsExpanded = !notificationSettingsExpanded }
-        ) {
-            Button(
-                onClick = { /* fun for notif*/ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text("Ieslēgt/izslēgt paziņojumus")
-            }
-
-            Button(
-                onClick = { /* fin for sound*/ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text("Skaņas iestatījumi")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Konfidencialitātes sadaļa
-        SettingsSection(
-            title = "Konfidencialitātes iestatījumi",
             icon = Icons.Default.PrivacyTip,
             expanded = privacySettingsExpanded,
             onToggle = { privacySettingsExpanded = !privacySettingsExpanded }
         ) {
-            Button(
-                onClick = { /* fun for dates */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text("Datu pārvaldība")
-            }
-
             NotificationPermissionButton()
         }
     }
@@ -259,7 +219,6 @@ fun SettingsSection(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Sadaļas galvene ar nolaižamo pogu
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -284,13 +243,12 @@ fun SettingsSection(
                 IconButton(onClick = onToggle) {
                     Icon(
                         Icons.Default.ArrowDropDown,
-                        contentDescription = if (expanded) "Salikt" else "Izvērst",
+                        contentDescription = if (expanded) "Свернуть" else "Развернуть",
                         modifier = Modifier.padding(4.dp)
                     )
                 }
             }
 
-            // Sadaļas saturs (pogas)
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),

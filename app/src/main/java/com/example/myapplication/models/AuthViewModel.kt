@@ -1,24 +1,33 @@
 package com.example.myapplication.models
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineScope
+import com.example.myapplication.ui.theme.ThemePreferences
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first // Import first()
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+    private val themePreferences = ThemePreferences(application)
+
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
 
     init {
         checkAuthStatus()
+    }
+
+    fun getCurrentUserId(): String? {
+        return FirebaseAuth.getInstance().currentUser?.uid
     }
 
     private fun checkAuthStatus() {
@@ -27,8 +36,9 @@ class AuthViewModel : ViewModel() {
         } else {
             // Check if the user document exists on app start
             auth.currentUser?.uid?.let { userId ->
-                CoroutineScope(Dispatchers.IO).launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     checkAndCreateUserDocument(userId, auth.currentUser?.email)
+                    loadUserProperties(userId) // Load properties on app start if authenticated
                 }
             }
             _authState.value = AuthState.Authenticated
@@ -45,8 +55,9 @@ class AuthViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     auth.currentUser?.uid?.let { userId ->
-                        CoroutineScope(Dispatchers.IO).launch {
+                        viewModelScope.launch(Dispatchers.IO) {
                             checkAndCreateUserDocument(userId, email) // Check/create on login
+                            loadUserProperties(userId) // Load properties on successful login
                             _authState.postValue(AuthState.Authenticated)
                         }
                     } ?: run {
@@ -95,8 +106,10 @@ class AuthViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     auth.currentUser?.uid?.let { userId ->
-                        CoroutineScope(Dispatchers.IO).launch {
+                        viewModelScope.launch(Dispatchers.IO) {
                             createUserDocument(userId, email) // Create on signup
+                            // No need to load properties immediately after signup,
+                            // as they will be default.
                             _authState.postValue(AuthState.Authenticated)
                         }
                     } ?: run {
@@ -110,8 +123,45 @@ class AuthViewModel : ViewModel() {
     }
 
     fun signOut() {
-        auth.signOut()
-        _authState.value = AuthState.Unauthenticated
+        viewModelScope.launch {
+            // Save user properties before signing out
+            auth.currentUser?.uid?.let { userId ->
+                saveUserProperties(userId)
+            }
+            auth.signOut()
+            _authState.value = AuthState.Unauthenticated
+        }
+    }
+
+    // Function to save user properties to Firestore
+    private suspend fun saveUserProperties(userId: String) {
+        try {
+            val isDarkTheme = themePreferences.isDarkTheme.first() // Get current theme from DataStore
+            val userProperties = hashMapOf<String, Any>(
+                "isDarkTheme" to isDarkTheme
+                // Add other user properties here
+            )
+            firestore.collection("users").document(userId).update(userProperties).await()
+            println("User properties saved successfully for $userId")
+        } catch (e: Exception) {
+            println("Error saving user properties: ${e.message}")
+        }
+    }
+
+    // Function to load user properties from Firestore
+    private suspend fun loadUserProperties(userId: String) {
+        try {
+            val document = firestore.collection("users").document(userId).get().await()
+            if (document.exists()) {
+                val isDarkTheme = document.getBoolean("isDarkTheme") ?: false // Default to false if not found
+                themePreferences.setDarkTheme(isDarkTheme) // Update DataStore with loaded theme
+                println("User properties loaded successfully for $userId")
+            } else {
+                println("User document not found for loading properties: $userId")
+            }
+        } catch (e: Exception) {
+            println("Error loading user properties: ${e.message}")
+        }
     }
 
     sealed class AuthState {

@@ -18,11 +18,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -32,20 +33,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.models.CalorieCalculatorViewModel
-//import com.example.myapplication.models.SleepViewModel
+import com.example.myapplication.models.MenstrualCalendarViewModel
 import com.example.myapplication.pages.CalorieCalculatorPage
 import com.example.myapplication.pages.CalorieHistoryPage
 import com.example.myapplication.pages.HomePage
 import com.example.myapplication.pages.IntermittentFastingPage
 import com.example.myapplication.pages.LoginPage
+import com.example.myapplication.pages.MenstrualCalendarPage
 import com.example.myapplication.pages.SignupPage
-//import com.example.myapplication.pages.SleepTrackerPage
-import com.example.myapplication.ui.theme.SettingsPage
+import com.example.myapplication.pages.SettingsPage
 import com.example.myapplication.pages.WaterTrackerPage
-//import com.example.myapplication.viewmodel.WaterViewModel
+import android.app.Application
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.StepCounter.StepCounterScreen
+import com.example.myapplication.models.StepCounterViewModel
 
-
-// Definē navigation items uz bottom navigation
+// Определение пунктов нижней навигации
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
     object Home : BottomNavItem(
         route = "home",
@@ -72,12 +75,12 @@ fun MyAppNavigation(
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
     bmiViewModel: BmiViewModel,
-//    waterViewModel: WaterViewModel,
     calorieCalculatorViewModel: CalorieCalculatorViewModel,
-//    sleepViewModel: SleepViewModel,
-//    fragmentManager: FragmentManager,
+    isDarkTheme: Boolean,
+    onThemeToggle: (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     // Observe authentication state
     val authState by authViewModel.authState.observeAsState(AuthViewModel.AuthState.Loading)
@@ -92,7 +95,7 @@ fun MyAppNavigation(
 
     Scaffold(
         bottomBar = {
-            // parāda bottom nav tikai tad , kad auth
+            // Показываем нижнюю навигацию только аутентифицированным пользователям
             if (isAuthenticated) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -105,12 +108,12 @@ fun MyAppNavigation(
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
                                 navController.navigate(item.route) {
-                                    // Pop up to the sākuma distanciju  grafā
-                                    // izvarās no lielā stack distancijām
+                                    // Pop up to the стартовой дистанции в графе
+                                    // избегаем большого стека дистанций
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
-                                    // Izvairās no vienā un tā pašā vairākām kopijām
+                                    // Избегаем множественных копий одной и той же дистанции
                                     launchSingleTop = true
                                     // Restore state when reselecting a previously selected item
                                     restoreState = true
@@ -135,24 +138,25 @@ fun MyAppNavigation(
                 SignupPage(modifier, navController, authViewModel)
             }
 
-            //galvēnie ekrāni (ar bottom navigation)
             composable(BottomNavItem.Home.route) {
-                HomePage(modifier, navController, authViewModel, todoViewModel,  bmiViewModel/*, waterViewModel*/ )
+                HomePage(modifier, navController, authViewModel, todoViewModel, bmiViewModel)
             }
 
-            // tiek izmantota *pagaidu* implementacija , līdz , kad ProfilePage tiek pareizi izvedoita
+            composable("step_counter") {
+                val stepCounterViewModel: StepCounterViewModel = viewModel()
+                StepCounterScreen(viewModel = stepCounterViewModel)
+            }
+
+
             composable(BottomNavItem.Profile.route) {
-                // Temporary profile page implementation
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        // dabuj user from firebase
                         val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
 
-                        // izraksta lietotāja vārdu
                         val userName = when {
                             !user?.displayName.isNullOrEmpty() -> user?.displayName
                             !user?.email.isNullOrEmpty() -> user?.email?.substringBefore('@')
@@ -183,27 +187,36 @@ fun MyAppNavigation(
                             },
                             modifier = Modifier.padding(top = 32.dp)
                         ) {
-                            Text("Iziet")
+                            Text("Выйти")
                         }
                     }
                 }
             }
 
-            // izmantoju jaunu iestatijumu lapu , nevis pagaidu lapu
+            // Используем новую страницу настроек
             composable(BottomNavItem.Settings.route) {
-                SettingsPage(modifier, navController, authViewModel)
+                SettingsPage(
+                    modifier = modifier,
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    isDarkTheme = isDarkTheme,
+                    onThemeToggle = onThemeToggle
+                )
             }
 
-
             composable("calorie_calculator") {
-               CalorieCalculatorPage(modifier, navController,
-                   calorieCalculatorViewModel = CalorieCalculatorViewModel()
-               )
-           }
+                CalorieCalculatorPage(
+                    modifier,
+                    navController,
+                    calorieCalculatorViewModel = calorieCalculatorViewModel
+                )
+            }
 
             composable("calorie_history") {
-                CalorieHistoryPage(modifier, navController,
-                    calorieCalculatorViewModel = CalorieCalculatorViewModel()
+                CalorieHistoryPage(
+                    modifier,
+                    navController,
+                    calorieCalculatorViewModel = calorieCalculatorViewModel
                 )
             }
 
@@ -215,15 +228,17 @@ fun MyAppNavigation(
                 IntermittentFastingPage(modifier, navController)
             }
 
-
-
-//            composable("sleep_tracker") {
-//                SleepTrackerPage(
-//                    navController = navController,
-//                    fragmentManager = fragmentManager, // Передаем FragmentManager
-//                    sleepViewModel = sleepViewModel   // Передаем SleepViewModel
-//                )
-//            }
+            // Добавляем маршрут к менструальному календарю
+            composable("menstrual_calendar") {
+                val menstrualCalendarViewModel = remember {
+                    MenstrualCalendarViewModel(application = context.applicationContext as Application)
+                }
+                MenstrualCalendarPage(
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    menstrualCalendarViewModel = menstrualCalendarViewModel
+                )
+            }
         }
     }
 }
