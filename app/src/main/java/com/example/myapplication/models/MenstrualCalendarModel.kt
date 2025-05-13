@@ -113,7 +113,7 @@ class MenstrualCalendarViewModel(application: Application) : AndroidViewModel(ap
     }
 
     // Установить дату начала цикла
-    fun setStartDate(date: LocalDate) {
+    fun setStartDate(date: LocalDate) { //
         selectedStartDate.value = date
         val dateStr = date.format(DateTimeFormatter.ISO_DATE)
         _cycleData.value = _cycleData.value.copy(startDate = dateStr)

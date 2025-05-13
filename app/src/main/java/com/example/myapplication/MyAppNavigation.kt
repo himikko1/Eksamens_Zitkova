@@ -47,6 +47,7 @@ import android.app.Application
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.StepCounter.StepCounterScreen
 import com.example.myapplication.models.StepCounterViewModel
+import com.example.myapplication.pages.TrainingVideosPage
 
 // Определение пунктов нижней навигации
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
@@ -237,6 +238,13 @@ fun MyAppNavigation(
                     navController = navController,
                     authViewModel = authViewModel,
                     menstrualCalendarViewModel = menstrualCalendarViewModel
+                )
+            }
+
+            composable("training_videos") {
+                //
+                TrainingVideosPage(
+                    navController = navController
                 )
             }
         }

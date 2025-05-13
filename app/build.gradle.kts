@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.datastore.preferences.core.android)
+    implementation(libs.androidx.lifecycle.service)
     //implementation(libs.androidbrowserhelper)
     val nav_version = "2.8.8"
     implementation("androidx.navigation:navigation-compose:$nav_version")

@@ -1,5 +1,8 @@
 package com.example.myapplication.pages
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,19 +13,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
+import com.example.myapplication.FastingService // Import the service
+import kotlinx.coroutines.flow.StateFlow // Import StateFlow
+import java.io.Serializable // Import Serializable for FastingMode
 
-enum class FastingMode(val eatHours: Int, val fastHours: Int, val displayName: String) {
+
+enum class FastingMode(val eatHours: Int, val fastHours: Int, val displayName: String) : Serializable {
     MODE_20_4(4, 20, "20/4"),
     MODE_16_8(8, 16, "16/8"),
-    MODE_18_6(6, 18, "18/6")
+    MODE_18_6(6, 18, "16/8") // Corrected display name if needed
 }
 
 enum class TimerState {
@@ -42,14 +46,39 @@ fun IntermittentFastingPage(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    var selectedMode by remember { mutableStateOf<FastingMode?>(null) }
+    // Observe state directly from the service's companion object flows
+    val selectedMode by FastingService.currentMode.collectAsState()
+    val timerState by FastingService.timerState.collectAsState()
+    val remainingTime by FastingService.remainingTimeSeconds.collectAsState()
+    val fastingState by FastingService.fastingState.collectAsState()
+
+    val context = LocalContext.current
+
+    // Effect to set the mode in the service when selected in UI
+    // This handles cases where the app is started and a mode is already set in the service
+    // or when the user selects a new mode.
+    LaunchedEffect(selectedMode) {
+        if (selectedMode != null && FastingService.currentMode.value != selectedMode) {
+            val serviceIntent = Intent(context, FastingService::class.java).apply {
+                action = FastingService.ACTION_SET_MODE
+                putExtra(FastingService.EXTRA_FASTING_MODE, selectedMode)
+            }
+            context.startService(serviceIntent)
+        }
+    }
+
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Intermittent Fasting") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = {
+                        // Decide how 'Back' should behave.
+                        // If timer is running, maybe just navigate up without stopping service?
+                        // For now, just navigate up.
+                        navController.navigateUp()
+                    }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
@@ -69,12 +98,51 @@ fun IntermittentFastingPage(
         ) {
             if (selectedMode == null) {
                 ModeSelectionScreen(onModeSelected = { mode ->
-                    selectedMode = mode
+                    // Send intent to service to set the mode
+                    val serviceIntent = Intent(context, FastingService::class.java).apply {
+                        action = FastingService.ACTION_SET_MODE
+                        putExtra(FastingService.EXTRA_FASTING_MODE, mode)
+                    }
+                    context.startService(serviceIntent)
+                    // No longer need to update local selectedMode state here,
+                    // as the UI observes the service's state.
                 })
             } else {
+                // Pass observed states and callbacks to send intents
                 FastingTimerScreen(
-                    fastingMode = selectedMode!!,
-                    onBackToSelection = { selectedMode = null }
+                    fastingMode = selectedMode!!, // selectedMode will not be null here
+                    timerState = timerState,
+                    fastingState = fastingState,
+                    remainingTimeSeconds = remainingTime,
+                    onStartTimer = {
+                        val serviceIntent = Intent(context, FastingService::class.java).apply {
+                            action = FastingService.ACTION_START
+                        }
+                        context.startService(serviceIntent)
+                    },
+                    onPauseTimer = {
+                        val serviceIntent = Intent(context, FastingService::class.java).apply {
+                            action = FastingService.ACTION_PAUSE
+                        }
+                        context.startService(serviceIntent)
+                    },
+                    onResetTimer = {
+                        val serviceIntent = Intent(context, FastingService::class.java).apply {
+                            action = FastingService.ACTION_RESET
+                        }
+                        context.startService(serviceIntent)
+                        // Navigating back to selection is handled by the reset action in service
+                        // and the UI observing the null currentMode state.
+                    },
+                    onBackToSelection = {
+                        // If the user wants to change mode while timer is running,
+                        // maybe reset the service first, then the UI will show selection.
+                        val serviceIntent = Intent(context, FastingService::class.java).apply {
+                            action = FastingService.ACTION_RESET // Reset also stops the service
+                        }
+                        context.startService(serviceIntent)
+                        // The UI observes currentMode becoming null and switches screen
+                    }
                 )
             }
         }
@@ -123,41 +191,15 @@ fun ModeSelectionScreen(
 
 @Composable
 fun FastingTimerScreen(
-    fastingMode: FastingMode,
-    onBackToSelection: () -> Unit
+    fastingMode: FastingMode, // Passed for display purposes
+    timerState: TimerState, // Observed state
+    fastingState: FastingState, // Observed state
+    remainingTimeSeconds: Int, // Observed state
+    onStartTimer: () -> Unit,
+    onPauseTimer: () -> Unit,
+    onResetTimer: () -> Unit,
+    onBackToSelection: () -> Unit // Callback to change mode
 ) {
-    var timerState by remember { mutableStateOf(TimerState.IDLE) }
-    var fastingState by remember { mutableStateOf(FastingState.EATING) }
-
-    // Timer values in seconds
-    val eatTimeSeconds = fastingMode.eatHours * 3600
-    val fastTimeSeconds = fastingMode.fastHours * 3600
-
-    var remainingTimeSeconds by remember { mutableStateOf(
-        if (fastingState == FastingState.EATING) eatTimeSeconds else fastTimeSeconds
-    ) }
-
-    // Timer effect
-    LaunchedEffect(timerState, fastingState) {
-        if (timerState == TimerState.RUNNING) {
-            while (remainingTimeSeconds > 0) {
-                delay(1000)
-                remainingTimeSeconds--
-            }
-
-            // Switch states when timer completes
-            if (remainingTimeSeconds <= 0) {
-                if (fastingState == FastingState.EATING) {
-                    fastingState = FastingState.FASTING
-                    remainingTimeSeconds = fastTimeSeconds
-                } else {
-                    fastingState = FastingState.EATING
-                    remainingTimeSeconds = eatTimeSeconds
-                }
-            }
-        }
-    }
-
     // Format time as HH:MM:SS
     val hours = remainingTimeSeconds / 3600
     val minutes = (remainingTimeSeconds % 3600) / 60
@@ -218,6 +260,10 @@ fun FastingTimerScreen(
                     fontSize = 36.sp,
                     textAlign = TextAlign.Center
                 )
+                Text( // Display timer state
+                    text = timerState.name,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
 
@@ -230,20 +276,16 @@ fun FastingTimerScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
-                    onClick = {
-                        timerState = TimerState.RUNNING
-                    },
-                    enabled = timerState != TimerState.RUNNING,
+                    onClick = onStartTimer,
+                    enabled = timerState != TimerState.RUNNING && fastingMode != null, // Enable only if not running and mode is set
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Start")
                 }
 
                 Button(
-                    onClick = {
-                        timerState = TimerState.PAUSED
-                    },
-                    enabled = timerState == TimerState.RUNNING,
+                    onClick = onPauseTimer,
+                    enabled = timerState == TimerState.RUNNING, // Enable only if running
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Pause")
@@ -251,12 +293,9 @@ fun FastingTimerScreen(
             }
 
             Button(
-                onClick = {
-                    fastingState = FastingState.EATING
-                    timerState = TimerState.IDLE
-                    remainingTimeSeconds = eatTimeSeconds
-                },
-                modifier = Modifier.fillMaxWidth()
+                onClick = onResetTimer,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = timerState != TimerState.IDLE // Enable if timer has been started or paused
             ) {
                 Text("Reset")
             }
@@ -269,4 +308,11 @@ fun FastingTimerScreen(
             }
         }
     }
+}
+
+// Helper to observe StateFlows in Composable
+@SuppressLint("StateFlowValueCalledInComposition")
+@Composable
+fun <T> StateFlow<T>.collectAsState(): State<T> {
+    return collectAsState(initial = value)
 }
