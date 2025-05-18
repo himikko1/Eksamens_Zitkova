@@ -78,6 +78,7 @@ class WaterViewModel(private val appContext: Context) : ViewModel() {
         }
     }
 
+    //dod paziņojumu
     fun scheduleWaterReminder() {
         val triggerTime = System.currentTimeMillis() + REMINDER_INTERVAL_MS
 
