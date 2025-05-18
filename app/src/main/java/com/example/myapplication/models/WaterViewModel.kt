@@ -56,6 +56,8 @@ class WaterViewModel(private val appContext: Context) : ViewModel() {
         }
     }
 
+
+    //saglabā ūdeni skaiti
     private fun saveWaterCount() {
         val data = hashMapOf("waterCount" to _waterCount.value, "lastDrinkTime" to System.currentTimeMillis())
         userId?.let {
@@ -72,7 +74,6 @@ class WaterViewModel(private val appContext: Context) : ViewModel() {
                     if (document != null && document.contains("waterCount")) {
                         _waterCount.value = (document.getLong("waterCount") ?: 0).toInt()
                     }
-                    // Consider loading and using the lastDrinkTime to schedule the first reminder on app start
                 }
         }
     }
