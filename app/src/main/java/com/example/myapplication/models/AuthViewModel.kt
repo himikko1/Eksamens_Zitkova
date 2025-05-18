@@ -34,30 +34,32 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         if (auth.currentUser == null) {
             _authState.value = AuthState.Unauthenticated
         } else {
-            // Check if the user document exists on app start
+            // Pārbauda, vai lietotāja dokuments pastāv lietotnes palaišanas brīdī
             auth.currentUser?.uid?.let { userId ->
                 viewModelScope.launch(Dispatchers.IO) {
                     checkAndCreateUserDocument(userId, auth.currentUser?.email)
-                    loadUserProperties(userId) // Load properties on app start if authenticated
+                    loadUserProperties(userId)
                 }
             }
             _authState.value = AuthState.Authenticated
         }
     }
 
+
+    //funkcija ļauj ielogoties sistēmān ar e-pastu un paroli
     fun login(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
             _authState.value = AuthState.Error("Email and password cannot be empty")
             return
         }
-        _authState.value = AuthState.Loading // Indicate loading state
+        _authState.value = AuthState.Loading
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     auth.currentUser?.uid?.let { userId ->
                         viewModelScope.launch(Dispatchers.IO) {
-                            checkAndCreateUserDocument(userId, email) // Check/create on login
-                            loadUserProperties(userId) // Load properties on successful login
+                            checkAndCreateUserDocument(userId, email)
+                            loadUserProperties(userId)
                             _authState.postValue(AuthState.Authenticated)
                         }
                     } ?: run {
