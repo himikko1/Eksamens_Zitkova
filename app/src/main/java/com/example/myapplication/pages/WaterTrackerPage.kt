@@ -34,7 +34,7 @@ fun WaterTrackerPage(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Water Tracker") },
+                title = { Text("Ūdens skaitītājs") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("home") }) {
                         Icon(
@@ -59,7 +59,7 @@ fun WaterTrackerPage(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text("Стаканов выпито: $waterCount")
+            Text("Glāzes dzērumā: $waterCount")
 
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,

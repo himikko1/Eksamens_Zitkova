@@ -53,7 +53,7 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
 
 
         Text(
-            text = "Welcome, $userName!",
+            text = "Sveiki, $userName!",
             fontSize = 22.sp,
             fontWeight = FontWeight.Medium
         )
@@ -61,7 +61,7 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Email: ${user?.email ?: "Not available"}",
+            text = "E-pasts: ${user?.email ?: "Not available"}",
             fontSize = 16.sp
         )
 

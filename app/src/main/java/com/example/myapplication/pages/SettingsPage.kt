@@ -131,7 +131,7 @@ fun SettingsPage(
                     contentDescription = "Treniņš",
                     modifier = Modifier.padding(end = 8.dp)
                 )
-                Text("Тренировки")
+                Text("Apmācību video")
             }
         }
 

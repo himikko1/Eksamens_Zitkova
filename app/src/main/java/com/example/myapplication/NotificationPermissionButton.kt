@@ -25,38 +25,34 @@ fun NotificationPermissionButton() {
     ) { isGranted: Boolean ->
         permissionGranted = isGranted
         if (isGranted) {
-            // Permission granted, you can now send notifications
-            println("Notification permission granted")
-            // Implement your notification sending logic here
+            // Atļauja piešķirta, tagad varat sūtīt paziņojumus
         } else {
-            // Permission denied
+            // Atļauja liegta
             println("Notification permission denied")
-            // Optionally, show a message to the user explaining why the permission is needed
         }
     }
 
     Button(
         onClick = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                // Request permission for Android 13 (API level 33) and above
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
-                // For older versions, the permission is often granted by default or requested during install.
-                // You might still want to check and inform the user.
                 if (!permissionGranted) {
                     println("Notification permission not explicitly requested on this Android version.")
-                    // Optionally, guide the user to enable notifications in settings.
                 } else {
                     println("Notification permission already granted.")
-                    // Implement your notification sending logic here
                 }
             }
         },
-        enabled = !permissionGranted // Disable the button if permission is already granted (optional)
+        enabled = !permissionGranted // Atslēgt pogu, ja atļauja jau ir piešķirta (nav obligāti)
     ) {
-        Text(if (permissionGranted) "Notifications Enabled" else "Request Notification Permission")
+        Text(if (permissionGranted) "Ieslēgti paziņojumi" else "Request Notification Permission")
     }
 }
+
+// Šī funkcija pārbauda, vai lietotnei ir piešķirta atļauja rādīt paziņojumus.
+// Android 13 (API 33) un jaunākās versijās ir nepieciešama POST_NOTIFICATIONS atļauja.
+// Vecākās Android versijās šī atļauja nav nepieciešama, tāpēc funkcija atgriež true.
 
 fun isNotificationPermissionGranted(context: android.content.Context): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -65,8 +61,6 @@ fun isNotificationPermissionGranted(context: android.content.Context): Boolean {
             Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
     } else {
-        // For older versions, the permission is often granted by default.
-        // You might need to check AppOpsManager for more precise status if needed.
         true
     }
 }

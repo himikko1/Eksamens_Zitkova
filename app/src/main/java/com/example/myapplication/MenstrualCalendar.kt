@@ -69,7 +69,7 @@ fun MenstrualCalendar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
-                Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Предыдущий месяц")
+                Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Iepriekšējais mēnesis")
             }
 
             Text(
@@ -79,7 +79,7 @@ fun MenstrualCalendar(
             )
 
             IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
-                Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Следующий месяц")
+                Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Nākamais mēnesis")
             }
         }
 
@@ -139,7 +139,7 @@ fun MenstrualCalendar(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "Обозначения:",
+                text = "Apzīmējumi:",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -156,7 +156,7 @@ fun MenstrualCalendar(
                         .background(Color(0xFFE57373), CircleShape) // Период
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Период")
+                Text("Periods")
             }
 
             // Marked day (individual, not part of period)
@@ -171,7 +171,7 @@ fun MenstrualCalendar(
                         .border(BorderStroke(2.dp, Color.Red), CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Отмеченный день (вне цикла)") // Clarified legend for marked day
+                Text("Atzīmētā diena (ārpus cikla)") // Clarified legend for marked day
             }
 
             // Today's date
@@ -190,7 +190,7 @@ fun MenstrualCalendar(
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Сегодня")
+                Text("Šodien")
             }
 
             // Cycle Start/End date
@@ -208,7 +208,7 @@ fun MenstrualCalendar(
                     // No text, visual style indicates it
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Начало/Конец цикла")
+                Text("Cikla sākums/ beigas")
             }
         }
 
@@ -263,7 +263,7 @@ fun MenstrualCalendar(
             else
                 ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
         ) {
-            Text("Отменить выбор даты")
+            Text("Atcelt datuma izvēli")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -277,38 +277,38 @@ fun MenstrualCalendar(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Информация о цикле",
+                    text = "Informācija par ciklu",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
-                    text = "Начало цикла: ${cycleData.startDate?.let {
+                    text = "Cikla sākums: ${cycleData.startDate?.let {
                         LocalDate.parse(it, DateTimeFormatter.ISO_DATE).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                    } ?: "Не установлено"}",
+                    } ?: "Nav noteikts"}",
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
 
                 Text(
-                    text = "Конец цикла: ${cycleData.endDate?.let {
+                    text = "Cikla beigas: ${cycleData.endDate?.let {
                         LocalDate.parse(it, DateTimeFormatter.ISO_DATE).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                    } ?: "Не установлено"}",
+                    } ?: "Nav noteikts"}",
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
 
                 Text(
-                    text = "Отмеченных дней: ${cycleData.markedDates.size}",
+                    text = "Atzīmētās dienas: ${cycleData.markedDates.size}",
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
 
                 // Display current selection mode for user feedback (optional but recommended)
                 Text(
-                    text = "Режим выбора: ${
+                    text = "Atlases režīms: ${
                         when(selectionMode) {
-                            is SelectionMode.None -> "Нет"
-                            is SelectionMode.SelectingStartDate -> "Выбор начала"
-                            is SelectionMode.SelectingEndDate -> "Выбор конца"
+                            is SelectionMode.None -> "Nē"
+                            is SelectionMode.SelectingStartDate -> "Sākuma izvēle"
+                            is SelectionMode.SelectingEndDate -> "Atlases beigas"
                         }
                     }",
                     fontSize = 14.sp,
