@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
 
         val themePreferences = ThemePreferences(this)
 
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContent {
             var isDarkTheme by remember { mutableStateOf(false) }
 

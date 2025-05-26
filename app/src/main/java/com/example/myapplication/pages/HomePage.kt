@@ -211,12 +211,14 @@ fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
         ) {
             Text(
                 text = "Jūsu ĶMI",
+                color = Color.Black,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             Text(
                 text = String.format("%.1f", bmiResult),
+                color = Color.Black,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -224,6 +226,7 @@ fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
 
             Text(
                 text = bmiCategory,
+                color = Color.Black,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
