@@ -11,12 +11,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocalDrink
+import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,7 +28,6 @@ import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.Todo
 import com.example.myapplication.TodoViewModel
-//import com.example.myapplication.viewmodel.WaterViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -35,12 +38,10 @@ fun HomePage(
     authViewModel: AuthViewModel,
     todoViewModel: TodoViewModel,
     bmiViewModel: BmiViewModel
-    //waterViewModel: WaterViewModel
 ) {
     val authState = authViewModel.authState.observeAsState()
     val error = todoViewModel.error.observeAsState()
 
-    // Rādīt kļūdu snackbar
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(authState.value) {
@@ -50,7 +51,6 @@ fun HomePage(
         }
     }
 
-    // Rādīt kļūdu snackbar, ja tāda ir
     LaunchedEffect(error.value) {
         error.value?.let {
             snackbarHostState.showSnackbar(
@@ -64,18 +64,20 @@ fun HomePage(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Izlogoties") },
+            CenterAlignedTopAppBar( // Changed to CenterAlignedTopAppBar for better aesthetics
+                title = { Text("Mājas Lapa", style = MaterialTheme.typography.titleLarge) }, // Stronger title
                 actions = {
                     IconButton(onClick = { authViewModel.signOut() }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "Logout"
+                            contentDescription = "Logout",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer // Use theme color
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
         },
@@ -86,38 +88,79 @@ fun HomePage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 8.dp)
-                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp) // Increased horizontal padding for better breathing room
+                .verticalScroll(rememberScrollState()), // Allows the whole screen to scroll
+            horizontalAlignment = Alignment.CenterHorizontally // Center content horizontally
         ) {
+            Spacer(modifier = Modifier.height(16.dp)) // Space before first card
 
+            // BMI Calculator Section
             BmiCalculator(
                 bmiViewModel = bmiViewModel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
-            Button(
-                onClick = { navController.navigate("water_tracker") },
+
+            // Activity Trackers Section
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(bottom = 16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use surface color for card background
             ) {
-                Text("Ūdens skaitītājs 💧")
-            }
-            Button(
-                onClick = { navController.navigate("step_counter") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text("Soļu skaitītājs")
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Aktivitātes",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround, // Space out buttons
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Water Tracker Button
+                        ElevatedButton( // Elevated button for a more distinct look
+                            onClick = { navController.navigate("water_tracker") },
+                            modifier = Modifier.weight(1f).padding(end = 8.dp),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(imageVector = Icons.Default.LocalDrink, contentDescription = "Water", modifier = Modifier.size(24.dp))
+                                Spacer(Modifier.height(4.dp))
+                                Text("Ūdens", style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
+
+                        // Step Counter Button
+                        ElevatedButton( // Elevated button for a more distinct look
+                            onClick = { navController.navigate("step_counter") },
+                            modifier = Modifier.weight(1f).padding(start = 8.dp),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(imageVector = Icons.Default.DirectionsRun, contentDescription = "Steps", modifier = Modifier.size(24.dp))
+                                Spacer(Modifier.height(4.dp))
+                                Text("Soļi", style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
+                    }
+                }
             }
 
-            TodoListOriginal(
+
+            // Todo List Section
+            TodoList( // Renamed TodoListOriginal for consistency
                 viewModel = todoViewModel,
                 modifier = Modifier
                     .fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(16.dp)) // Space at the bottom
         }
     }
 }
@@ -135,7 +178,8 @@ fun BmiCalculator(
     Card(
         modifier = modifier
             .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use surface color for card background
     ) {
         Column(
             modifier = Modifier
@@ -143,19 +187,19 @@ fun BmiCalculator(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Kalkulators KMI",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
+                text = "Ķermeņa masas indekss (ĶMI)", // More descriptive title
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), // Bolder title
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            // izvada augumu
+            // Height input
             Text(
-                text = "Augums: ${height.toInt()} см",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 4.dp)
+                text = "Augums: ${height.toInt()} cm",
+                style = MaterialTheme.typography.bodyLarge, // Larger text for values
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            // slider prieks augumu
             Slider(
                 value = height,
                 onValueChange = { bmiViewModel.updateHeight(it) },
@@ -164,14 +208,13 @@ fun BmiCalculator(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // izvada svaru
+            // Weight input
             Text(
                 text = "Svars: ${weight.toInt()} kg",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 4.dp)
+                style = MaterialTheme.typography.bodyLarge, // Larger text for values
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            // slaider prieks svaru
             Slider(
                 value = weight,
                 onValueChange = { bmiViewModel.updateWeight(it) },
@@ -180,7 +223,7 @@ fun BmiCalculator(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // rezultats
+            // BMI Result Display
             BmiResultDisplay(bmiResult, bmiCategory)
         }
     }
@@ -188,11 +231,18 @@ fun BmiCalculator(
 
 @Composable
 fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
+    // Defined a more Material Design friendly color palette for BMI categories
     val backgroundColor = when {
-        bmiResult < 18.5 -> Color(0xFFF5F5DC)
-        bmiResult < 25 -> Color(0xFFDEF1D8)
-        bmiResult < 30 -> Color(0xFFFFE5B4)
-        else -> Color(0xFFFFCCCB)
+        bmiResult < 18.5 -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f) // Underweight
+        bmiResult < 25 -> MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f) // Normal weight
+        bmiResult < 30 -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f) // Overweight
+        else -> MaterialTheme.colorScheme.error.copy(alpha = 0.6f) // Obesity
+    }
+    val contentColor = when {
+        bmiResult < 18.5 -> MaterialTheme.colorScheme.onSecondaryContainer
+        bmiResult < 25 -> MaterialTheme.colorScheme.onTertiaryContainer
+        bmiResult < 30 -> MaterialTheme.colorScheme.onErrorContainer
+        else -> MaterialTheme.colorScheme.onError
     }
 
     Card(
@@ -201,7 +251,8 @@ fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
             .padding(top = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -211,24 +262,24 @@ fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
         ) {
             Text(
                 text = "Jūsu ĶMI",
-                color = Color.Black,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+                color = contentColor,
+                style = MaterialTheme.typography.titleSmall, // Slightly smaller title
+                modifier = Modifier.padding(bottom = 4.dp)
             )
 
             Text(
                 text = String.format("%.1f", bmiResult),
-                color = Color.Black,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                color = contentColor,
+                style = MaterialTheme.typography.headlineLarge, // Larger and more prominent BMI value
+                fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             Text(
                 text = bmiCategory,
-                color = Color.Black,
+                color = contentColor,
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -236,24 +287,25 @@ fun BmiResultDisplay(bmiResult: Float, bmiCategory: String) {
 
 
 @Composable
-fun TodoListOriginal(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
+fun TodoList(viewModel: TodoViewModel, modifier: Modifier = Modifier) { // Renamed TodoListOriginal
     val todoList by viewModel.todoList.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
     var inputText by remember { mutableStateOf("") }
     var editingTodo by remember { mutableStateOf<Todo?>(null) }
 
     Column(modifier = modifier) {
-        // Input sekcijā
+        // Input section
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = if (editingTodo == null) "Pievienot jaunu uzdevumu" else "Rediģēt uzdevumu",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -263,17 +315,21 @@ fun TodoListOriginal(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
                     label = { Text("Uzdevuma nosaukums") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    enabled = !isLoading
+                    enabled = !isLoading,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = 16.dp), // Increased top padding for buttons
                     horizontalArrangement = Arrangement.End
                 ) {
                     if (editingTodo != null) {
-                        OutlinedButton(
+                        TextButton( // TextButton for cancel
                             onClick = {
                                 editingTodo = null
                                 inputText = ""
@@ -289,11 +345,9 @@ fun TodoListOriginal(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
                         onClick = {
                             if (inputText.isNotBlank()) {
                                 if (editingTodo != null) {
-                                    // Update existing todo
                                     viewModel.updateTodo(editingTodo!!.copy(title = inputText))
                                     editingTodo = null
                                 } else {
-                                    // Add new todo
                                     viewModel.addTodo(inputText)
                                 }
                                 inputText = ""
@@ -307,37 +361,40 @@ fun TodoListOriginal(viewModel: TodoViewModel, modifier: Modifier = Modifier) {
             }
         }
 
-        // loading indikators
+        // Loading indicator
         if (isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(32.dp), // More padding for loader
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary // Use theme primary color
+                )
             }
         }
 
-        // Todo list
+        // Todo list or empty state
         if (!isLoading && todoList.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 32.dp),
+                    .padding(vertical = 48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Nav uzdevumu. Pievienojiet savu pirmo uzdevumu!",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.outline
+                    text = "Nav uzdevumu.\nPievienojiet savu pirmo uzdevumu!", // Multiline for better readability
+                    style = MaterialTheme.typography.titleMedium, // Stronger text for empty state
+                    color = MaterialTheme.colorScheme.outline,
+                    textAlign = TextAlign.Center
                 )
             }
         } else if (!isLoading) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp),
+                    .heightIn(max = 500.dp), // Use heightIn for better responsiveness
                 contentPadding = PaddingValues(vertical = 8.dp),
                 userScrollEnabled = true
             ) {
@@ -370,7 +427,8 @@ fun TodoItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant) // Slightly different color for list items
     ) {
         Row(
             modifier = Modifier
@@ -378,34 +436,36 @@ fun TodoItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Checkbox ja pabeidza
             Checkbox(
                 checked = item.completed,
                 onCheckedChange = { onToggleComplete(item) },
-                modifier = Modifier.padding(end = 8.dp),
-                enabled = isEnabled
+                modifier = Modifier.size(24.dp), // Fixed size for checkbox
+                enabled = isEnabled,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
 
+            Spacer(modifier = Modifier.width(16.dp)) // Increased space
 
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp)
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = item.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textDecoration = if (item.completed) TextDecoration.LineThrough else TextDecoration.None
+                    style = MaterialTheme.typography.titleSmall, // Stronger text for title
+                    textDecoration = if (item.completed) TextDecoration.LineThrough else TextDecoration.None,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Text(
                     text = SimpleDateFormat("HH:mm, dd.MM.yyyy", Locale.getDefault()).format(item.createdAt),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f) // Slightly faded timestamp
                 )
             }
 
-            // Action buttons
             Row {
                 IconButton(
                     onClick = { onEdit(item) },
