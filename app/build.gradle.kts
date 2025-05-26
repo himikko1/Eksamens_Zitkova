@@ -112,6 +112,9 @@ dependencies {
     //water
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
+    //video
+    implementation("io.coil-kt:coil-compose:2.7.0") // Or Glide if you prefer
+
     //stepCounter
     implementation("androidx.compose.ui:ui:1.5.2")
     implementation("androidx.activity:activity-compose:1.8.0")

@@ -1,6 +1,8 @@
 package com.example.myapplication
 
 import PhotoManager
+import TrainingVideosPage
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,32 +26,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.StepCounter.StepCounterScreen
 import com.example.myapplication.models.AuthViewModel
 import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.models.CalorieCalculatorViewModel
 import com.example.myapplication.models.MenstrualCalendarViewModel
+import com.example.myapplication.models.StepCounterViewModel
 import com.example.myapplication.pages.CalorieCalculatorPage
 import com.example.myapplication.pages.CalorieHistoryPage
 import com.example.myapplication.pages.HomePage
 import com.example.myapplication.pages.IntermittentFastingPage
 import com.example.myapplication.pages.LoginPage
 import com.example.myapplication.pages.MenstrualCalendarPage
-import com.example.myapplication.pages.SignupPage
 import com.example.myapplication.pages.SettingsPage
+import com.example.myapplication.pages.SignupPage
 import com.example.myapplication.pages.WaterTrackerPage
-import android.app.Application
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.StepCounter.StepCounterScreen
-import com.example.myapplication.models.StepCounterViewModel
-import com.example.myapplication.pages.TrainingVideosPage
 
-// Определение пунктов нижней навигации
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
     object Home : BottomNavItem(
         route = "home",
@@ -96,7 +95,6 @@ fun MyAppNavigation(
 
     Scaffold(
         bottomBar = {
-            // Показываем нижнюю навигацию только аутентифицированным пользователям
             if (isAuthenticated) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -109,14 +107,10 @@ fun MyAppNavigation(
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
                                 navController.navigate(item.route) {
-                                    // Pop up to the стартовой дистанции в графе
-                                    // избегаем большого стека дистанций
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
-                                    // Избегаем множественных копий одной и той же дистанции
                                     launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
                                     restoreState = true
                                 }
                             }
@@ -194,7 +188,6 @@ fun MyAppNavigation(
                 }
             }
 
-            // Используем новую страницу настроек
             composable(BottomNavItem.Settings.route) {
                 SettingsPage(
                     modifier = modifier,
@@ -229,7 +222,6 @@ fun MyAppNavigation(
                 IntermittentFastingPage(modifier, navController)
             }
 
-            // Добавляем маршрут к менструальному календарю
             composable("menstrual_calendar") {
                 val menstrualCalendarViewModel = remember {
                     MenstrualCalendarViewModel(application = context.applicationContext as Application)
@@ -242,7 +234,6 @@ fun MyAppNavigation(
             }
 
             composable("training_videos") {
-                //
                 TrainingVideosPage(
                     navController = navController
                 )
