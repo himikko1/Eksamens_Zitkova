@@ -125,7 +125,7 @@ fun MenstrualCalendar(
                     }
                     is SelectionMode.None -> {
                         // Default click action when not in a specific selection mode
-                        viewModel.toggleDateMark(date)
+                        //viewModel.toggleDateMark(date)
                     }
                 }
             }
@@ -160,7 +160,7 @@ fun MenstrualCalendar(
             }
 
             // Marked day (individual, not part of period)
-            Row(
+            /*Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
@@ -171,8 +171,8 @@ fun MenstrualCalendar(
                         .border(BorderStroke(2.dp, Color.Red), CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Atzīmētā diena (ārpus cikla)") // Clarified legend for marked day
-            }
+                //Text("Atzīmētā diena (ārpus cikla)") // Clarified legend for marked day
+            }*/
 
             // Today's date
             Row(

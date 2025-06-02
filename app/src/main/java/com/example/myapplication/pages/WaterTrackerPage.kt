@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalContext // Still needed for other uses, but not for ViewModel factory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.models.WaterViewModel
@@ -29,9 +29,9 @@ import com.example.myapplication.models.DailyWater
 fun WaterTrackerPage(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: WaterViewModel = viewModel(
-        factory = WaterViewModelFactory(LocalContext.current.applicationContext)
-    )
+    // REMOVE THE FACTORY HERE!
+    // The WaterViewModel now extends AndroidViewModel, so it handles its own application context.
+    viewModel: WaterViewModel = viewModel()
 ) {
     val waterCount by viewModel.waterCount.collectAsState()
     val weeklyWaterStats by viewModel.weeklyWaterStats.collectAsState()
@@ -149,23 +149,23 @@ fun WaterTrackerPage(
     }
 }
 
-class WaterViewModelFactory(private val context: Context) : androidx.lifecycle.ViewModelProvider.Factory {
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return WaterViewModel(appContext = context) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+// DELETE THIS CLASS! It's no longer needed if WaterViewModel extends AndroidViewModel
+// class WaterViewModelFactory(private val context: Context) : androidx.lifecycle.ViewModelProvider.Factory {
+//     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+//         if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
+//             @Suppress("UNCHECKED_CAST")
+//             return WaterViewModel() as T
+//         }
+//         throw IllegalArgumentException("Unknown ViewModel class")
+//     }
+// }
 
 @Composable
 fun WaterTrackerVisual(waterCount: Int) {
     val displayedGlasses = minOf(waterCount, 9)
 
-    // Ensure columns is at least 1 if displayedGlasses is 0
     val columns = when {
-        displayedGlasses <= 0 -> 1 // Set to 1 column if no glasses to display to avoid crash
+        displayedGlasses <= 0 -> 1
         displayedGlasses <= 2 -> displayedGlasses
         displayedGlasses == 3 -> 3
         displayedGlasses <= 6 -> 3
@@ -181,7 +181,6 @@ fun WaterTrackerVisual(waterCount: Int) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         userScrollEnabled = false
     ) {
-        // Only render items if displayedGlasses is greater than 0
         if (displayedGlasses > 0) {
             items(displayedGlasses) { index ->
                 val imageSizeModifier = when (displayedGlasses) {
@@ -200,11 +199,9 @@ fun WaterTrackerVisual(waterCount: Int) {
                 )
             }
         } else {
-            // Optional: You could show a placeholder or empty state here
-            // For example, a single greyed out glass or a message
             item {
                 Text(
-                    text = "Vēl neesi dzēris šodien!", // "Haven't drunk yet today!"
+                    text = "Vēl neesi dzēris šodien!",
                     modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

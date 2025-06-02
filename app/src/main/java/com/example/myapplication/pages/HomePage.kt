@@ -64,14 +64,14 @@ fun HomePage(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar( // Changed to CenterAlignedTopAppBar for better aesthetics
-                title = { Text("Mājas Lapa", style = MaterialTheme.typography.titleLarge) }, // Stronger title
+            CenterAlignedTopAppBar(
+                title = { Text("Izlogoties", style = MaterialTheme.typography.titleLarge) },
                 actions = {
                     IconButton(onClick = { authViewModel.signOut() }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Logout",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer // Use theme color
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 },
@@ -88,13 +88,12 @@ fun HomePage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp) // Increased horizontal padding for better breathing room
-                .verticalScroll(rememberScrollState()), // Allows the whole screen to scroll
-            horizontalAlignment = Alignment.CenterHorizontally // Center content horizontally
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp)) // Space before first card
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // BMI Calculator Section
             BmiCalculator(
                 bmiViewModel = bmiViewModel,
                 modifier = Modifier
@@ -102,13 +101,12 @@ fun HomePage(
                     .padding(bottom = 16.dp)
             )
 
-            // Activity Trackers Section
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use surface color for card background
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -179,7 +177,7 @@ fun BmiCalculator(
         modifier = modifier
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use surface color for card background
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
@@ -187,8 +185,8 @@ fun BmiCalculator(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Ķermeņa masas indekss (ĶMI)", // More descriptive title
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), // Bolder title
+                text = "Ķermeņa masas indekss (ĶMI)",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 16.dp),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -196,7 +194,7 @@ fun BmiCalculator(
             // Height input
             Text(
                 text = "Augums: ${height.toInt()} cm",
-                style = MaterialTheme.typography.bodyLarge, // Larger text for values
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

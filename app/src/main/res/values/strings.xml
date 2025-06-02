@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="settings_title">Settings</string>
+    <string name="app_settings">Lietotnes iestatījumi<!--App Settings--></string>
+    <string name="dark_theme">Tumšā tēma</string>
+    <string name="language_settings">Language Settings</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_english">English</string>
+    <string name="language_latvian">Latvian</string>
 </resources>

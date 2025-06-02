@@ -7,7 +7,7 @@ import android.content.Intent
 class WaterReminderBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null) {
-            NotificationUtils.showNotification(context)
+            NotificationUtils.showWaterNotification(context)
         }
     }
 }

@@ -1,5 +1,7 @@
+// models/MenstrualCalendarViewModel.kt
 package com.example.myapplication.models
 
+import android.app.AlarmManager
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -92,7 +94,7 @@ class MenstrualCalendarViewModel(application: Application) : AndroidViewModel(ap
                     "userId" to userId,
                     "startDate" to _cycleData.value.startDate,
                     "endDate" to _cycleData.value.endDate,
-                    "markedDates" to _cycleData.value.markedDates
+                    //"markedDates" to _cycleData.value.markedDates // Marked dates are not directly saved this way in your current map
                 )
 
                 firestore.collection("users")
@@ -113,18 +115,19 @@ class MenstrualCalendarViewModel(application: Application) : AndroidViewModel(ap
     }
 
     // Установить дату начала цикла
-    fun setStartDate(date: LocalDate) { //
+    fun setStartDate(date: LocalDate) {
         selectedStartDate.value = date
         val dateStr = date.format(DateTimeFormatter.ISO_DATE)
         _cycleData.value = _cycleData.value.copy(startDate = dateStr)
-        // Помечаем начальную дату
-        toggleDateMark(date)
-        // Если есть конечная дата, помечаем даты между началом и концом
         selectedEndDate.value?.let { endDate ->
             markPeriodDates(date, endDate)
         }
         saveData()
+
+        // HERE IS THE CALL FOR NOTIFICATION
+        NotificationUtils.scheduleMenstrualReminder(getApplication())
     }
+
     private fun markPeriodDates(startDate: LocalDate, endDate: LocalDate) {
         val newMarkedDates = _cycleData.value.markedDates.toMutableList()
         var currentDate = startDate
@@ -144,28 +147,12 @@ class MenstrualCalendarViewModel(application: Application) : AndroidViewModel(ap
         selectedEndDate.value = date
         val dateStr = date.format(DateTimeFormatter.ISO_DATE)
         _cycleData.value = _cycleData.value.copy(endDate = dateStr)
-        toggleDateMark(date)
         selectedStartDate.value?.let { startDate ->
             markPeriodDates(startDate, date)
         }
         saveData()
     }
 
-    fun toggleDateMark(date: LocalDate) {
-        val dateStr = date.format(DateTimeFormatter.ISO_DATE)
-        val currentMarkedDates = _cycleData.value.markedDates.toMutableList()
-
-        if (dateStr in currentMarkedDates) {
-            currentMarkedDates.remove(dateStr)
-        } else {
-            currentMarkedDates.add(dateStr)
-        }
-
-        _cycleData.value = _cycleData.value.copy(markedDates = currentMarkedDates)
-        saveData()
-    }
-
-    // Проверить, отмечена ли дата
     fun isDateMarked(date: LocalDate): Boolean {
         val dateStr = date.format(DateTimeFormatter.ISO_DATE)
         return dateStr in _cycleData.value.markedDates

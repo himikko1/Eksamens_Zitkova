@@ -38,10 +38,10 @@ class WaterNotificationActionReceiver : BroadcastReceiver() {
                         // You'll need a way to access your AlarmManager and PendingIntent here.
                         // Consider passing the context to a function in NotificationUtils or
                         // having a separate AlarmScheduler utility class.
-                        NotificationUtils.scheduleReminder(context.applicationContext)
+                        NotificationUtils.scheduleWaterReminder(context.applicationContext)
                         Log.d("DrinkActionReceiver", "Next reminder scheduled.")
                     } else {
-                        NotificationUtils.cancelReminder(context.applicationContext)
+                        NotificationUtils.cancelWaterReminder(context.applicationContext)
                         Log.d("DrinkActionReceiver", "Reminder cancelled (goal reached).")
                     }
 

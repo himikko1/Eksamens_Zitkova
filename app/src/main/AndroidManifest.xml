@@ -11,10 +11,11 @@
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -47,9 +48,18 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".models.MenstrualReminderBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.myapplication.ACTION_MENSTRUAL_REMINDER_ALARM" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".FastingService"
-            android:foregroundServiceType="health" android:exported="false"/>
+            android:foregroundServiceType="health"
+            android:exported="false"/>
 
     </application>
 

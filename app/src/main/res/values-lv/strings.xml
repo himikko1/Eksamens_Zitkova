@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mana Aplikācija</string>
+    <string name="settings_title">Iestatījumi</string>
+    <string name="app_settings">Programmas iestatījumi</string>
+    <string name="dark_theme">Tumšā tēma</string>
+    <string name="language_settings">Valodu iestatījumi</string>
+    <string name="select_language">Izvēlēties valodu</string>
+    <string name="language_english">Angļu</string>
+    <string name="language_latvian">Latviešu</string>
+</resources>

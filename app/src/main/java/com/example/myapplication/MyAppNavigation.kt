@@ -15,15 +15,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalContext // Keep this for context, but not for ViewModel factories
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +39,9 @@ import com.example.myapplication.models.BmiViewModel
 import com.example.myapplication.models.CalorieCalculatorViewModel
 import com.example.myapplication.models.MenstrualCalendarViewModel
 import com.example.myapplication.models.StepCounterViewModel
+import com.example.myapplication.models.ThemeViewModel
+//import com.example.myapplication.models.TodoViewModel
+import com.example.myapplication.models.WaterViewModel
 import com.example.myapplication.pages.CalorieCalculatorPage
 import com.example.myapplication.pages.CalorieHistoryPage
 import com.example.myapplication.pages.HomePage
@@ -48,6 +51,7 @@ import com.example.myapplication.pages.MenstrualCalendarPage
 import com.example.myapplication.pages.SettingsPage
 import com.example.myapplication.pages.SignupPage
 import com.example.myapplication.pages.WaterTrackerPage
+
 
 sealed class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
     object Home : BottomNavItem(
@@ -76,11 +80,11 @@ fun MyAppNavigation(
     todoViewModel: TodoViewModel,
     bmiViewModel: BmiViewModel,
     calorieCalculatorViewModel: CalorieCalculatorViewModel,
-    isDarkTheme: Boolean,
-    onThemeToggle: (Boolean) -> Unit
+    themeViewModel: ThemeViewModel
 ) {
     val navController = rememberNavController()
-    val context = LocalContext.current
+    // No longer need to manually cast LocalContext.current.applicationContext as Application
+    // val context = LocalContext.current.applicationContext as Application
 
     // Observe authentication state
     val authState by authViewModel.authState.observeAsState(AuthViewModel.AuthState.Loading)
@@ -142,7 +146,6 @@ fun MyAppNavigation(
                 StepCounterScreen(viewModel = stepCounterViewModel)
             }
 
-
             composable(BottomNavItem.Profile.route) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Column(
@@ -193,8 +196,7 @@ fun MyAppNavigation(
                     modifier = modifier,
                     navController = navController,
                     authViewModel = authViewModel,
-                    isDarkTheme = isDarkTheme,
-                    onThemeToggle = onThemeToggle
+                    themeViewModel = themeViewModel
                 )
             }
 
@@ -215,7 +217,9 @@ fun MyAppNavigation(
             }
 
             composable("water_tracker") {
-                WaterTrackerPage(modifier, navController)
+                // Initialize WaterViewModel without a factory
+                val waterViewModel: WaterViewModel = viewModel()
+                WaterTrackerPage(modifier, navController, waterViewModel)
             }
 
             composable("intermittent_fasting") {
@@ -223,9 +227,8 @@ fun MyAppNavigation(
             }
 
             composable("menstrual_calendar") {
-                val menstrualCalendarViewModel = remember {
-                    MenstrualCalendarViewModel(application = context.applicationContext as Application)
-                }
+                // Initialize MenstrualCalendarViewModel without a factory
+                val menstrualCalendarViewModel: MenstrualCalendarViewModel = viewModel()
                 MenstrualCalendarPage(
                     navController = navController,
                     authViewModel = authViewModel,
