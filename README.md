@@ -19,7 +19,7 @@
 
 ## Tehniskās prasības
 
-- Android / iOS ierīce
+- Android 
 - Interneta savienojums (nepieciešams video skatīšanai un datu sinhronizācijai)
 - Maksimālais augšupielādes faila izmērs: 5MB (JPG/PNG)
 
